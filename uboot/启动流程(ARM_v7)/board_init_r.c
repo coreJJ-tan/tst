@@ -1,0 +1,3 @@
+board_init_f初始化了一些外设和gd的成员变量，但并没有初始化所有的外设，这时候就需要board_init_r函数来实现后续的工作。
+
+board_init_r函数在common/board_r.c中定义

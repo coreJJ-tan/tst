@@ -4,7 +4,7 @@
     正常宿主机对u-boot完成编译后，要对编译好的u-boot进行移植烧录，将一编译好的u-boot.bin文件烧写到sd卡或者是开发板的flash存储器中，启动阶段, 芯片内部的ROMCODE首先将
 FLASH(eMMC/NAND)中的SPL加载到IRAM, 然后直接跳转到SPL运行, 然后由SPL将uboot从FLASH上搬移到DDR上, 并运行之。
 
-1、第 1 步：Romboot阶段
+1、Romboot阶段
     一般 MCU 内部还有个固化的引导程序(Romboot), 单板上电后，这段程序会初始化部分外设使得能够与外部通信，随后进行下一阶段启动。
 
 2、 SPL 阶段
@@ -50,7 +50,10 @@ SPL编译：
 	函数 board_init_f_init_reserve 用于初始化 gd，其实就是清零处理。并且还设置了gd->malloc_base 为 gd 基地址+gd 大小，再做 16 字节对齐
 	函数 relocate_code 是代码重定位函数，此函数负责将 uboot 拷贝到新的地方去
 	函数 relocate_vectors 对中断向量表做重定位
+    board_init_f 和 board_init_r 之间的汇编代码主要是进行uboot镜像重定位和清除bss段的
 	
+https://blog.csdn.net/messi1018/article/details/107191981
+
 4、linux kernel 阶段
 
 5、File system 阶段
