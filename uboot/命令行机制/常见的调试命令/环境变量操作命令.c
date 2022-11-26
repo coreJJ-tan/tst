@@ -1,0 +1,3 @@
+setenv
+saveenv
+printenv

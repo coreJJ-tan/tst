@@ -1,0 +1,4 @@
+dhcp
+ping
+nfs
+tftpboot
