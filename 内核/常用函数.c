@@ -71,15 +71,15 @@ scripts/kallsyms.c
 // kzalloc()、kmalloc()函数====================================================================================================
 	kzalloc( )函数与kmalloc( )函数功能类似，都是基于slab分配在物理上连续的实际的内存。但是kzalloc( )函数在分配了内存之后，又将内存中的内容都初始化为0。
 	static __always_inline void *kmalloc(size_t size, gfp_t f lags)
-	分配在物理上连续的内存，虚拟地址自然也是连续的，它基于slab分配实际上存在的连续的内存。
-	size：是指要分配的内存的字节数。
-	flags：是分配标志，它提供了多种kmalloc( )的行为。其中分配标志（flags）的常见取值参考alloc_pages( )函数的分析
+		分配在物理上连续的内存，虚拟地址自然也是连续的，它基于slab分配实际上存在的连续的内存。
+		size：是指要分配的内存的字节数。
+		flags：是分配标志，它提供了多种kmalloc( )的行为。其中分配标志（flags）的常见取值参考alloc_pages( )函数的分析
 	
 	
 	static inline void *kzalloc(size_t size, gfp_t flags)
-	size：指要分配的内存的字节数。
-	flags：分配标志，它提供了多种kzalloc( )的行为，其选项取值参考kmalloc( )函数的分析。
-	返回值：该内存对象的起始地址
+		size：指要分配的内存的字节数。
+		flags：分配标志，它提供了多种kzalloc( )的行为，其选项取值参考kmalloc( )函数的分析。
+		返回值：该内存对象的起始地址
 	
 // BUG_ON()与WARN_ON()====================================================================================================
 linux 内核态调试函数BUG_ON()与WARN_ON()
