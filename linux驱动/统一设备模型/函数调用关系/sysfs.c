@@ -1,5 +1,13 @@
     sysfs提供了4类文件的创建与管理，分别是目录、普通文件、软链接文件、二进制文件
 
+// 宏定义篇
+__ATTR(_name, _mode, _show, _store)
+__ATTR_PREALLOC(_name, _mode, _show, _store)
+__ATTR_RO(_name)
+__ATTR_WO(_name)
+__ATTR_RW(_name)
+__ATTR_NULL
+
 // dir篇
 
 // file篇

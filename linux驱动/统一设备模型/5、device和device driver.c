@@ -114,7 +114,7 @@ struct device {
     struct klist_node   knode_class;
     struct class        *class; // 该设备属于哪个class。
     const struct attribute_group **groups;  // 该设备的默认attribute集合。将会在设备注册时自动在sysfs中创建对应的文件。/* optional groups */
-    void    (*release)(struct device *dev);
+    void    (*release)(struct device *dev); // device_release()会使用到，如果定义，对应的kobject引用计数为0时会调用
     struct iommu_group  *iommu_group;
     bool            offline_disabled:1;
     bool            offline:1;
@@ -201,7 +201,7 @@ struct device_type { // device_type是内嵌在struct device结构中的一个�
     const struct attribute_group **groups; // 该类型设备的公共attribute集合。设备注册时，会同时注册这些attribute。
     int (*uevent)(struct device *dev, struct kobj_uevent_env *env); // 所有相同类型的设备，会有一些共有的uevent需要发送，由该接口实现
     char *(*devnode)(struct device *dev, umode_t *mode, kuid_t *uid, kgid_t *gid); // devtmpfs有关的内容，暂不说明
-    void (*release)(struct device *dev); // 如果device结构没有提供release接口，就要查询它所属的type是否提供。用于释放device变量所占的空间
+    void (*release)(struct device *dev); // device_release()会使用到，如果device结构没有提供release接口，就要查询它所属的type是否提供。用于释放device变量所占的空间
     const struct dev_pm_ops *pm;
 };
 
