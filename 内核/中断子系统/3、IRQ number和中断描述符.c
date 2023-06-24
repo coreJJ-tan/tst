@@ -1,6 +1,6 @@
 1、概念
 1.1 什么是中断描述符？
-    在linux kernel中，对于每一个外设的IRQ都用struct irq_desc来描述，我们称之中断描述符（struct irq_desc）。linux kernel中会有一，个数据结构
+    在linux kernel中，对于每一个外设的IRQ都用struct irq_desc来描述，我们称之中断描述符（struct irq_desc）。linux kernel中会有一个数据结构
 保存了关于所有IRQ的中断描述符信息，我们称之中断描述符DB。当发生中断后，首先获取触发中断的HW interupt ID，然后通过irq domain翻译成IRQ number，
 然后通过 IRQ number 就可以获取对应的中断描述符。调用中断描述符中的 highlevel irq-events handler （即 handle_irq() 成员函数） 来进行中断处理
 就OK了。而 highlevel irq-events handler 主要进行下面两个操作：
@@ -14,7 +14,7 @@ interrupt controller等）一起控制完成的。
 handler就OK了。更准确的说是通用中断处理模块不关心外部interrupt controller的组织细节（电源管理模块当然要关注具体的设备（interrupt controller
 也是设备）的拓扑结构）。一言以蔽之，通用中断处理模块可以用一个线性的table来管理一个个的外部中断，这个表的每个元素就是一个irq描述符，在kernel中
 定义如下：
-struct irq_desc irq_desc[NR_IRQS] __cacheline_aligned_in_smp = {
+struct irq_desc irq_desc[NR_IRQS] __cacheline_aligned_in_smp = { // 中断描述符lookup table
     [0 ... NR_IRQS-1] = {
         .handle_irq    = handle_bad_irq,
         .depth        = 1,
@@ -48,90 +48,7 @@ struct irq_desc irq_desc[NR_IRQS] __cacheline_aligned_in_smp = {
 闭CPU中断的。
 
 3、结构体
-typedef   void (*irq_flow_handler_t)(unsigned int irq, struct irq_desc *desc);
-/**
- * struct irq_desc - interrupt descriptor
- * @irq_data:       per irq and chip data passed down to chip functions
- * @kstat_irqs:     irq stats per cpu
- * @handle_irq:     highlevel irq-events handler
- * @preflow_handler:    handler called before the flow handler (currently used by sparc)
- * @action:     the irq action chain
- * @status:     status information
- * @core_internal_state__do_not_mess_with_it: core internal status information
- * @depth:      disable-depth, for nested irq_disable() calls
- * @wake_depth:     enable depth, for multiple irq_set_irq_wake() callers
- * @irq_count:      stats field to detect stalled irqs
- * @last_unhandled: aging timer for unhandled count
- * @irqs_unhandled: stats field for spurious unhandled interrupts
- * @threads_handled:    stats field for deferred spurious detection of threaded handlers
- * @threads_handled_last: comparator field for deferred spurious detection of theraded handlers
- * @lock:       locking for SMP
- * @affinity_hint:  hint to user space for preferred irq affinity
- * @affinity_notify:    context for notification of affinity changes
- * @pending_mask:   pending rebalanced interrupts
- * @threads_oneshot:    bitfield to handle shared oneshot threads
- * @threads_active: number of irqaction threads currently running
- * @wait_for_threads:   wait queue for sync_irq to wait for threaded handlers
- * @nr_actions:     number of installed actions on this descriptor
- * @no_suspend_depth:   number of irqactions on a irq descriptor with
- *          IRQF_NO_SUSPEND set
- * @force_resume_depth: number of irqactions on a irq descriptor with
- *          IRQF_FORCE_RESUME set
- * @dir:        /proc/irq/ procfs entry
- * @name:       flow handler name for /proc/interrupts output
- */
-struct irq_desc {
-    struct irq_data     irq_data;
-    unsigned int __percpu   *kstat_irqs; // IRQ的统计信息
-    irq_flow_handler_t  handle_irq; // 见下面的注解
-#ifdef CONFIG_IRQ_PREFLOW_FASTEOI
-    irq_preflow_handler_t   preflow_handler;
-#endif
-    struct irqaction    *action;    /* IRQ action list */ // action指向一个struct irqaction的链表。如果一个interrupt request line允许共享，那么该
-                                    // 链表中的成员可以是多个，否则，该链表只有一个节点。
-    unsigned int        status_use_accessors; // 中断描述符的状态，参考IRQ_xxxx
-    unsigned int        core_internal_state__do_not_mess_with_it; // 这个有着很长名字的符号core_internal_state__do_not_mess_with_it在具体使用的
-                                    // 时候被被简化成istate，表示internal state。就像这个名字定义的那样，我们最好不要直接修改它。
-                                    // #define istate core_internal_state__do_not_mess_with_it
-    unsigned int        depth;      /* nested irq disables */ // 我们可以通过enable和disable一个指定的IRQ来控制内核的并发，从而保护临界区的数据。对
-                                    // 一个IRQ进行enable和disable的操作可以嵌套（当然一定要成对使用），depth是描述嵌套深度的信息。
-    unsigned int        wake_depth; /* nested wake enables */ // wake_depth是和电源管理中的wake up source相关。通过irq_set_irq_wake接口可以enable
-                                    // 或者disable一个IRQ中断是否可以把系统从suspend状态唤醒。同样的，对一个IRQ进行wakeup source的enable和disable的
-                                    // 操作可以嵌套（当然一定要成对使用），wake_depth是描述嵌套深度的信息。
-    unsigned int        irq_count;  /* For detecting broken IRQs */ // irq_count、last_unhandled和irqs_unhandled用于处理broken IRQ 的处理。所谓
-                                    // broken IRQ就是由于种种原因（例如错误firmware），IRQ handler没有定向到指定的IRQ上，当一个IRQ没有被处理的时候，
-                                    // kernel可以为这个没有被处理的handler启动scan过程，让系统中所有的handler来认领该IRQ。
-    unsigned long       last_unhandled; /* Aging timer for unhandled count */
-    unsigned int        irqs_unhandled;
-    atomic_t        threads_handled;
-    int         threads_handled_last;
-    raw_spinlock_t      lock;   // 保护该中断描述符的spin lock。
-    struct cpumask      *percpu_enabled; // 一个中断描述符可能会有两种情况，一种是该IRQ是global，一旦disable了该irq，那么对于所有的CPU而言都是disable
-                                // 的。还有一种情况，就是该IRQ是per CPU的，也就是说，在某个CPU上disable了该irq只是disable了本CPU的IRQ而已，其他的CPU
-                                // 仍然是enable的。percpu_enabled是一个描述该IRQ在各个CPU上是否enable的成员。
-#ifdef CONFIG_SMP
-    const struct cpumask    *affinity_hint; // 和irq affinity相关
-    struct irq_affinity_notify *affinity_notify;
-#ifdef CONFIG_GENERIC_PENDING_IRQ
-    cpumask_var_t       pending_mask;
-#endif
-#endif
-    unsigned long       threads_oneshot; // threads_oneshot、threads_active和wait_for_threads是和IRQ thread相关
-    atomic_t        threads_active;
-    wait_queue_head_t       wait_for_threads;
-#ifdef CONFIG_PM_SLEEP
-    unsigned int        nr_actions;
-    unsigned int        no_suspend_depth;
-    unsigned int        cond_suspend_depth;
-    unsigned int        force_resume_depth;
-#endif
-#ifdef CONFIG_PROC_FS
-    struct proc_dir_entry   *dir; // 该IRQ对应的proc接口
-#endif
-    int         parent_irq;
-    struct module       *owner;
-    const char      *name;
-} ____cacheline_internodealigned_in_smp;
+---- struct irq_desc
     handle_irq 成员就是highlevel irq-events handler，何谓high level？站在高处自然看不到细节。我认为high level是和specific相对，specific handler
 处理具体的事务，例如处理一个按键中断、处理一个磁盘中断。而high level则是对处理各种中断交互过程的一个抽象，根据下列硬件的不同：
     （1）中断控制器
@@ -143,161 +60,78 @@ struct irq_desc {
         （d）处理EOI类型的中断handler（handle_fasteoi_irq）
     会另外有一份文档对high level handler进行更详细的描述。
 
-typedef irqreturn_t (*irq_handler_t)(int, void *);
-/**
- * struct irqaction - per interrupt action descriptor
- * @handler:    interrupt handler function
- * @name:   name of the device
- * @dev_id: cookie to identify the device
- * @percpu_dev_id:  cookie to identify the device
- * @next:   pointer to the next irqaction for shared interrupts
- * @irq:    interrupt number
- * @flags:  flags (see IRQF_* above)
- * @thread_fn:  interrupt handler function for threaded interrupts
- * @thread: thread pointer for threaded interrupts
- * @thread_flags:   flags related to @thread
- * @thread_mask:    bitmask for keeping track of @thread activity
- * @dir:    pointer to the proc/irq/NN/name entry
- */
-struct irqaction {
-    irq_handler_t       handler;
-    void            *dev_id;
-    void __percpu       *percpu_dev_id;
-    struct irqaction    *next;
-    irq_handler_t       thread_fn;
-    struct task_struct  *thread;
-    unsigned int        irq;
-    unsigned int        flags;
-    unsigned long       thread_flags;
-    unsigned long       thread_mask;
-    const char      *name;
-    struct proc_dir_entry   *dir;
-} ____cacheline_internodealigned_in_smp;
-
-
-/**
- * struct irq_data - per irq and irq chip data passed down to chip functions
- * @mask:       precomputed bitmask for accessing the chip registers
- * @irq:        interrupt number
- * @hwirq:      hardware interrupt number, local to the interrupt domain
- * @node:       node index useful for balancing
- * @state_use_accessors: status information for irq chip functions.
- *          Use accessor functions to deal with it
- * @chip:       low level interrupt hardware access
- * @domain:     Interrupt translation domain; responsible for mapping
- *          between hwirq number and linux irq number.
- * @parent_data:    pointer to parent struct irq_data to support hierarchy
- *          irq_domain
- * @handler_data:   per-IRQ data for the irq_chip methods
- * @chip_data:      platform-specific per-chip private data for the chip
- *          methods, to allow shared chip implementations
- * @msi_desc:       MSI descriptor
- * @affinity:       IRQ affinity on SMP
- *
- * The fields here need to overlay the ones in irq_desc until we
- * cleaned up the direct references and switched everything over to
- * irq_data.
- */
-struct irq_data {
-    u32         mask;   // 用于访问芯片寄存器的预计算位掩码
-    unsigned int        irq;    // IRQ number
-    unsigned long       hwirq;  // HW interrupt ID
-    unsigned int        node;   // NUMA node index
-    unsigned int        state_use_accessors;    // 底层状态，参考IRQD_xxxx
-    struct irq_chip     *chip;  // 该中断描述符对应的irq chip数据结构
-    struct irq_domain   *domain;    // 该中断描述符对应的irq domain数据结构
-#ifdef  CONFIG_IRQ_DOMAIN_HIERARCHY
-    struct irq_data     *parent_data;
-#endif
-    void            *handler_data;  // 和外设specific handler相关的私有数据
-    void            *chip_data; // 和中断控制器相关的私有数据
-    struct msi_desc     *msi_desc;
-    cpumask_var_t       affinity;   // 和irq affinity相关
-};
+---- struct irqaction
+---- struct irq_data
     node 成员用来保存中断描述符的内存位于哪一个memory node上。 对于支持NUMA（Non Uniform Memory Access Architecture）的系统，其内存空间并不是均
 一的，而是被划分成不同的node，对于不同的memory node，CPU其访问速度是不一样的。如果一个IRQ大部分（或者固定）由某一个CPU处理，那么在动态分配中断描述
 符的时候，应该考虑将内存分配在该CPU访问速度比较快的memory node上。
 
-/**
- * struct irq_chip - hardware interrupt chip descriptor
- *
- * @name:       name for /proc/interrupts
- * @irq_startup:    start up the interrupt (defaults to ->enable if NULL)
- * @irq_shutdown:   shut down the interrupt (defaults to ->disable if NULL)
- * @irq_enable:     enable the interrupt (defaults to chip->unmask if NULL)
- * @irq_disable:    disable the interrupt
- * @irq_ack:        start of a new interrupt
- * @irq_mask:       mask an interrupt source
- * @irq_mask_ack:   ack and mask an interrupt source
- * @irq_unmask:     unmask an interrupt source
- * @irq_eoi:        end of interrupt
- * @irq_set_affinity:   set the CPU affinity on SMP machines
- * @irq_retrigger:  resend an IRQ to the CPU
- * @irq_set_type:   set the flow type (IRQ_TYPE_LEVEL/etc.) of an IRQ
- * @irq_set_wake:   enable/disable power-management wake-on of an IRQ
- * @irq_bus_lock:   function to lock access to slow bus (i2c) chips
- * @irq_bus_sync_unlock:function to sync and unlock slow bus (i2c) chips
- * @irq_cpu_online: configure an interrupt source for a secondary CPU
- * @irq_cpu_offline:    un-configure an interrupt source for a secondary CPU
- * @irq_suspend:    function called from core code on suspend once per chip
- * @irq_resume:     function called from core code on resume once per chip
- * @irq_pm_shutdown:    function called from core code on shutdown once per chip
- * @irq_calc_mask:  Optional function to set irq_data.mask for special cases
- * @irq_print_chip: optional to print special chip info in show_interrupts
- * @irq_request_resources:  optional to request resources before calling
- *              any other callback related to this irq
- * @irq_release_resources:  optional to release resources acquired with
- *              irq_request_resources
- * @irq_compose_msi_msg:    optional to compose message content for MSI
- * @irq_write_msi_msg:  optional to write message content for MSI
- * @irq_get_irqchip_state:  return the internal state of an interrupt
- * @irq_set_irqchip_state:  set the internal state of a interrupt
- * @flags:      chip specific flags
- */
-struct irq_chip { // struct irq_chip 包括了若干和具体Interrupt controller相关的callback函数，其被嵌套在struct irq_desc -> struct irq_data之内，
-                  // 用于描述对一个 HW interrupt ID 的中断源的操作
-    const char  *name;  // 该中断控制器的名字，用于/proc/interrupts中的显示
-    unsigned int (*irq_startup)(struct irq_data *data); // start up 对应 HW interrupt ID 的中断。如果不设定的话，会被设定为 enable 函数
-    void        (*irq_shutdown)(struct irq_data *data); // shutdown 对应 HW interrupt ID 的中断。如果不设定的话，会被设定为 disable 函数
-    void        (*irq_enable)(struct irq_data *data); // 使能对应 HW interrupt ID 的中断。如果不设定的话，会被设定为 unmask 函数
-    void        (*irq_disable)(struct irq_data *data); // 失能对应 HW interrupt ID 的中断
-
-    void        (*irq_ack)(struct irq_data *data); // 和具体的硬件相关，有些中断控制器必须在Ack之后（清除pending的状态）才能接受到新的中断。
-    void        (*irq_mask)(struct irq_data *data); // 屏蔽指定的的HW interrupt ID
-    void        (*irq_mask_ack)(struct irq_data *data); // 屏蔽并ack指定的HW interrupt ID。
-    void        (*irq_unmask)(struct irq_data *data); // 取消屏蔽指定的HW interrupt ID
-    void        (*irq_eoi)(struct irq_data *data); // 有些中断控制器（例如GIC）提供了这样的寄存器接口，让CPU可以通知中断控制器，它已经处理完一个中断
-
-    int     (*irq_set_affinity)(struct irq_data *data, const struct cpumask *dest, bool force); // 在SMP的情况下，可以通过该callback函数设定CPU affinity
-    int     (*irq_retrigger)(struct irq_data *data); // 重新触发一次中断，一般用在中断丢失的场景下。如果硬件不支持retrigger，可以使用软件的方法。
-    int     (*irq_set_type)(struct irq_data *data, unsigned int flow_type); // 设定指定的 HW interrupt ID的触发方式，电平触发还是边缘触发
-    int     (*irq_set_wake)(struct irq_data *data, unsigned int on); // 和电源管理相关，用来enable/disable指定的中断源作为唤醒的条件。
-
-    void        (*irq_bus_lock)(struct irq_data *data); // 有些interrupt controller是连接到慢速总线上（例如一个i2c接口的IO expander芯片），在
-                                                        // 访问这些芯片的时候需要lock住那个慢速bus（只能有一个client在使用I2C bus）
-    void        (*irq_bus_sync_unlock)(struct irq_data *data); // 	unlock慢速总线
-
-    void        (*irq_cpu_online)(struct irq_data *data);
-    void        (*irq_cpu_offline)(struct irq_data *data);
-
-    void        (*irq_suspend)(struct irq_data *data); // 电源管理相关的callback函数
-    void        (*irq_resume)(struct irq_data *data);
-    void        (*irq_pm_shutdown)(struct irq_data *data);
-
-    void        (*irq_calc_mask)(struct irq_data *data);
-
-    void        (*irq_print_chip)(struct irq_data *data, struct seq_file *p); // /proc/interrupts中的信息显示
-    int     (*irq_request_resources)(struct irq_data *data);
-    void        (*irq_release_resources)(struct irq_data *data);
-
-    void        (*irq_compose_msi_msg)(struct irq_data *data, struct msi_msg *msg);
-    void        (*irq_write_msi_msg)(struct irq_data *data, struct msi_msg *msg);
-
-    int     (*irq_get_irqchip_state)(struct irq_data *data, enum irqchip_irq_state which, bool *state);
-    int     (*irq_set_irqchip_state)(struct irq_data *data, enum irqchip_irq_state which, bool state);
-
-    unsigned long   flags;
-};
+---- struct irq_chip
 
 4、初始化相关的中断描述符的API
 4.1 静态定义的中断描述符初始化
+---- int __init early_irq_init(void)
+    该函数在kernel_start函数中被调用一次
+    主要实现的功能有：
+        遍历整个中断描述符的lookup table，对每一个entry进行初始化，这个lookup table在内核中是静态定义的，如下：
+        struct irq_desc irq_desc[NR_IRQS] __cacheline_aligned_in_smp = { ... }
+        具体初始化的内容为：申请各种内存，初始化spin lock，设置一些默认值等
+
+4.2 使用Radix tree的中断描述符初始化
+---- int __init early_irq_init(void)
+    和4.1所定义的函数名一样，具体通过 CONFIG_SPARSE_IRQ 宏区分，该函数在kernel_start函数中被调用一次
+    主要实现的功能有：
+        初始化默认的smp irq affinity机制
+        初始化 nr_irqs 的值，nr_irqs（是个全局变量）是当前系统中IRQ number的最大值
+        申请initcnt数量的中断描述符（struct irq_desc），并插入对应的radix tree中（initcnt是当前CPU体系结构中支持的中断描述符的个数）
+    说明：即便是配置了CONFIG_SPARSE_IRQ选项，在中断描述符初始化的时候，也有机会预先分配一定数量（initcnt数量）的IRQ。这个数量由arch_probe_nr_irqs决定
+
+4.3 分配和释放中断描述符
+    对于使用Radix tree来保存中断描述符DB的linux kernel，其中断描述符是动态分配的，可以使用irq_alloc_descs()和irq_free_descs()来分配和释放中断描述符。
+alloc_desc函数也会对中断描述符进行初始化，初始化的内容和静态定义的中断描述符初始化过程是一样的。最大可以分配的ID是IRQ_BITMAP_BITS，定义如下：
+#ifdef CONFIG_SPARSE_IRQ
+# define IRQ_BITMAP_BITS    (NR_IRQS + 8196)----对于Radix tree，除了预分配的，还可以动态分配8196个中断描述符
+#else                                                                             
+# define IRQ_BITMAP_BITS    NR_IRQS----对于静态定义的，IRQ最大值就是NR_IRQS
+#endif
+
+5、和中断控制器相关的中断描述符的接口
+    这部分的接口主要有两类，irq_desc_get_xxx和irq_set_xxx，由于get接口API非常简单，这里不再描述，主要描述set类别的接口API。此外，还有一些locked版
+本的set接口API，定义为__irq_set_xxx，这些API的调用者应该已经持有保护irq desc的spinlock，因此，这些locked版本的接口没有中断描述符的spin lock进行操
+作。这些接口有自己特定的使用场合，这里也不详细描述了.
+
+---- int irq_set_chip(unsigned int irq, struct irq_chip *chip)
+    这个接口函数用来设定中断描述符中desc->irq_data.chip成员
+
+---- int irq_set_irq_type(unsigned int irq, unsigned int type)
+    这个函数是用来设定该irq number的trigger type的。
+    参见上面这两个函数的内部代码，有些疑问，第一个问题就是：为何irq_set_chip接口函数使用irq_get_desc_lock来获取中断描述符，而irq_set_irq_type这个
+函数却需要irq_get_desc_buslock呢？其实也很简单，irq_set_chip不需要访问底层的irq chip（也就是interrupt controller），但是irq_set_irq_type需要。
+设定一个IRQ的trigger type最终要调用desc->irq_data.chip->irq_set_type函数对底层的interrupt controller进行设定。这时候，问题来了，对于嵌入SOC内部
+的interrupt controller，当然没有问题，因为访问这些中断控制器的寄存器memory map到了CPU的地址空间，访问非常的快，因此，关闭中断＋spin lock来保护中断
+描述符当然没有问题，但是，如果该interrupt controller是一个I2C接口的IO expander芯片（这类芯片是扩展的IO，也可以提供中断功能），这时，让其他CPU进行
+spin操作太浪费CPU时间了（bus操作太慢了，会spin很久的）。肿么办？当然只能是用其他方法lock住bus了（例如mutex，具体实现是和irq chip中的irq_bus_lock实
+现相关）。一旦lock住了slow bus，然后就可以关闭中断了（中断状态保存在flag中）。
+    解决了bus lock的疑问后，还有一个看起来奇奇怪怪的宏：IRQ_GET_DESC_CHECK_GLOBAL。为何在irq_set_chip函数中不设定检查（check的参数是0），而在
+irq_set_irq_type接口函数中要设定global的check，到底是什么意思呢？既然要检查，那么检查什么呢？和“global”对应的不是local而是“per CPU”，内核中的宏定
+义是：IRQ_GET_DESC_CHECK_PERCPU。SMP情况下，从系统角度看，中断有两种形态（或者叫mode）：
+    （1）1-N mode。只有1个processor处理中断
+    （2）N-N mode。所有的processor都是独立的收到中断，如果有N个processor收到中断，那么就有N个处理器来处理该中断。
+    听起来有些抽象，我们还是用GIC作为例子来具体描述。在GIC中，SPI使用1-N模型，而PPI和SGI使用N-N模型。对于SPI，由于采用了1-N模型，系统（硬件加上软件）
+必须保证一个中断被一个CPU处理。对于GIC，一个SPI的中断可以trigger多个CPU的interrupt line（如果Distributor中的Interrupt Processor Targets Registers
+有多个bit被设定），但是，该interrupt source和CPU的接口寄存器（例如ack register）只有一套，也就是说，这些寄存器接口是全局的，是global的，一旦一个
+CPU ack（读Interrupt Acknowledge Register，获取interrupt ID）了该中断，那么其他的CPU看到的该interupt source的状态也是已经ack的状态。在这种情况下，
+如果第二个CPU ack该中断的时候，将获取一个spurious interrupt ID。
+    对于PPI或者SGI，使用N-N mode，其interrupt source的寄存器是per CPU的，也就是每个CPU都有自己的、针对该interrupt source的寄存器接口（这些寄存器
+叫做banked register）。一个CPU 清除了该interrupt source的pending状态，其他的CPU感知不到这个变化，它们仍然认为该中断是pending的。
+    对于irq_set_irq_type这个接口函数，它是for 1-N mode的interrupt source使用的。如果底层设定该interrupt是per CPU的，那么irq_set_irq_type要返回错误。
+
+---- int irq_set_chip_data(unsigned int irq, void *data)
+    每个irq chip总有自己私有的数据，我们称之chip data。这个函数是用来设定该irq number的chip data
+
+---- void __irq_set_handler(unsigned int irq, irq_flow_handler_t handle, int is_chained, const char *name)
+    这是中断处理的核心内容，__irq_set_handler就是设定high level handler的接口函数，不过一般不会直接调用，而是通过irq_set_chip_and_handler_name或者
+irq_set_chip_and_handler来进行设定。
+    理解这个函数的关键是在is_chained这个参数。这个参数是用在interrupt级联的情况下。例如中断控制器B级联到中断控制器A的第x个interrupt source上。那么对于
+A上的x这个interrupt而言，在设定其IRQ handler参数的时候要设定is_chained参数等于1，由于这个interrupt source用于级联，因此不能probe、不能被request（已经
+被中断控制器B使用了），不能被threaded（具体中断线程化的概念在其他文档中描述）

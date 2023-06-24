@@ -14,36 +14,7 @@ http://www.wowotech.net/irq_subsystem/irq-domain.html
 
 2、相关接口
 2.1 相关结构体
-/**
- * struct irq_domain_ops - Methods for irq_domain objects
- * @match: Match an interrupt controller device node to a host, returns
- *         1 on a match
- * @map: Create or update a mapping between a virtual irq number and a hw
- *       irq number. This is called only once for a given mapping.
- * @unmap: Dispose of such a mapping
- * @xlate: Given a device tree node and interrupt specifier, decode
- *         the hardware irq number and linux irq type value.
- *
- * Functions below are provided by the driver and called whenever a new mapping
- * is created or an old mapping is disposed. The driver can then proceed to
- * whatever internal data structures management is required. It also needs
- * to setup the irq_desc when returning from map().
- */
-struct irq_domain_ops {
-    int (*match)(struct irq_domain *d, struct device_node *node); // 用于匹配domain
-    int (*map)(struct irq_domain *d, unsigned int virq, irq_hw_number_t hw); // 线性映射
-    void (*unmap)(struct irq_domain *d, unsigned int virq); 
-    int (*xlate)(struct irq_domain *d, struct device_node *node, const u32 *intspec, unsigned int intsize, unsigned long *out_hwirq, 
-                unsigned int *out_type); // 通过参数,线性hirq获取
-
-#ifdef  CONFIG_IRQ_DOMAIN_HIERARCHY
-    /* extended V2 interfaces to support hierarchy irq_domains */
-    int (*alloc)(struct irq_domain *d, unsigned int virq, unsigned int nr_irqs, void *arg); //树形节点申请,映射（只有树形才有这个）
-    void (*free)(struct irq_domain *d, unsigned int virq, unsigned int nr_irqs);
-    void (*activate)(struct irq_domain *d, struct irq_data *irq_data); // 中断激活
-    void (*deactivate)(struct irq_domain *d, struct irq_data *irq_data);
-#endif
-};
+---- struct irq_domain_ops
     xlate函数：语义是翻译（translate）的意思，那么到底翻译什么呢？在DTS文件中，各个使用中断的device node会通过一些属性（例如interrupts和interrupt-parent
 属性）来提供中断信息给kernel以便kernel可以正确的进行driver的初始化动作。这里，interrupts属性所表示的interrupt specifier只能由具体的interrupt controller
 （也就是irq domain）来解析。而xlate函数就是将指定的设备（node参数）上若干个（intsize参数）中断属性（intspec参数）翻译成HW interrupt ID（out_hwirq参数）和
@@ -59,53 +30,7 @@ trigger类型（out_type）。
 
 这些设定不适合由具体的硬件驱动来设定，因此在中断控制器，也就是irq domain的callback函数中设定。
 
-/**
- * struct irq_domain - Hardware interrupt number translation object
- * @link: Element in global irq_domain list.
- * @name: Name of interrupt domain
- * @ops: pointer to irq_domain methods
- * @host_data: private data pointer for use by owner.  Not touched by irq_domain
- *             core code.
- * @flags: host per irq_domain flags
- *
- * Optional elements
- * @of_node: Pointer to device tree nodes associated with the irq_domain. Used
- *           when decoding device tree interrupt specifiers.
- * @gc: Pointer to a list of generic chips. There is a helper function for
- *      setting up one or more generic chips for interrupt controllers
- *      drivers using the generic chip library which uses this pointer.
- * @parent: Pointer to parent irq_domain to support hierarchy irq_domains
- *
- * Revmap data, used internally by irq_domain
- * @revmap_direct_max_irq: The largest hwirq that can be set for controllers that
- *                         support direct mapping
- * @revmap_size: Size of the linear map table @linear_revmap[]
- * @revmap_tree: Radix map tree for hwirqs that don't fit in the linear map
- * @linear_revmap: Linear table of hwirq->virq reverse mappings
- */
-struct irq_domain { // 一个中断控制器就可以看成是一个domain
-    struct list_head link;  // 连接各个domain的链表节点，链表头为 irq_domain_list，是个全局链表，定义在 ./kernel/irq/irqdomain.c 中
-    const char *name;   // domain的名字
-    const struct irq_domain_ops *ops; // 当前domain的处理函数
-    void *host_data; // 定义了底层中断控制器使用的私有数据，和具体的中断控制器相关（对于GIC，该指针指向一个struct gic_chip_data数据结构）。
-    unsigned int flags;
-
-    /* Optional data */
-    struct device_node *of_node; // 该domain对应的中断控制器的device node
-    struct irq_domain_chip_generic *gc;
-#ifdef  CONFIG_IRQ_DOMAIN_HIERARCHY
-    struct irq_domain *parent; // 树形结构的父节点domain
-#endif
-
-    /* reverse map data. The linear map gets appended to the irq_domain */
-    irq_hw_number_t hwirq_max; // 该domain中最大的那个HW interrupt ID
-    unsigned int revmap_direct_max_irq; // hwirq和virq 1:1映射支持的最大数量
-    unsigned int revmap_size; // 线性映射的size，对于 Radix Tree map和no map，该值等于0
-    
-    struct radix_tree_root revmap_tree; // Radix Tree map使用到的radix tree root node
-    unsigned int linear_revmap[]; // 线性映射使用的查找表  这是个柔性数组
-};
-
+---- struct irq_domain
     对于线性映射：
     （1） linear_revmap 保存了一个线性的查找表，index是HW interrupt ID，table中保存了IRQ number值
     （2） revmap_size 等于线性的查找表的size。
