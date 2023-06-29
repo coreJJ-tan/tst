@@ -75,3 +75,10 @@ static void __exception_irq_entry gic_handle_irq(struct pt_regs *regs)
 }
 
 2.3 handle_domain_irq函数
+    参见 irqdesc.c 中的解析。
+
+    综上，平时开发只需要了解的是，发生中断时，会先进入中断描述符的high level irq event handler，才会进入驱动注册的中断函数。具体怎么进入，参见
+handle_domain_irq函数。
+
+http://www.wowotech.net/irq_subsystem/High_level_irq_event_handler.html
+未完，待续...
