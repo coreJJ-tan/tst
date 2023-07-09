@@ -4,3 +4,5 @@
 
 2、 CONFIG_SMP
     配置内核是否支持SMP，SMP 即多核 CPU
+
+3、 CONFIG_SERIAL_CORE_CONSOLE

@@ -48,7 +48,7 @@ struct tty_driver {
     /*
      * Pointer to the tty data structures
      */
-    struct tty_struct **ttys;
+    struct tty_struct **ttys; // 保存每个设备的tty_struct列表
     struct tty_port **ports;
     struct ktermios **termios;
     void *driver_state; // 可存放tty driver的私有数据。

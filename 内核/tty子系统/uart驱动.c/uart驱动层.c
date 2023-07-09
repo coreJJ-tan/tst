@@ -1,0 +1,1 @@
+以 imx6ull 为例，相关的驱动代码在 drivers/tty/serial/imx.c
