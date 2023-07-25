@@ -48,7 +48,6 @@ struct uart_ops {
     int     (*poll_get_char)(struct uart_port *);
 #endif
 };
-
 struct uart_port {
     spinlock_t      lock;           /* port lock */
     unsigned long       iobase;         /* in/out[bwl] */
@@ -183,7 +182,6 @@ struct uart_port {
     struct serial_rs485     rs485;
     void            *private_data;      /* generic platform data pointer */
 };
-
 /* This is the state information which is persistent across opens. */
 struct uart_state {
     struct tty_port     port;
@@ -193,7 +191,6 @@ struct uart_state {
 
     struct uart_port    *uart_port;
 };
-
 struct uart_driver {
     struct module       *owner;
     const char      *driver_name;
@@ -208,7 +205,6 @@ struct uart_driver {
     struct tty_driver   *tty_driver;
 };
 
-
 2、API
 /* This routine is used by the interrupt handler to schedule processing in the software interrupt portion of the driver. */
 void uart_write_wakeup(struct uart_port *port)
@@ -218,7 +214,6 @@ void uart_write_wakeup(struct uart_port *port)
     BUG_ON(!state);
     tty_wakeup(state->port.tty);
 }
-
 /**
  *  uart_update_timeout - update per-port FIFO timeout.
  *  @port:  uart_port structure describing the port
@@ -254,7 +249,6 @@ void uart_update_timeout(struct uart_port *port, unsigned int cflag, unsigned in
     /* Figure the timeout to send the above number of bits. Add .02 seconds of slop */
     port->timeout = (HZ * bits) / baud + HZ/50;
 }
-
 /**
  *  uart_get_baud_rate - return baud rate for a particular port
  *  @port: uart_port structure describing the port in question.
@@ -274,9 +268,7 @@ void uart_update_timeout(struct uart_port *port, unsigned int cflag, unsigned in
  *  we're actually going to be using. Don't do this for the case
  *  where B0 is requested ("hang up").
  */
-unsigned int
-uart_get_baud_rate(struct uart_port *port, struct ktermios *termios,
-           struct ktermios *old, unsigned int min, unsigned int max)
+unsigned int uart_get_baud_rate(struct uart_port *port, struct ktermios *termios, struct ktermios *old, unsigned int min, unsigned int max)
 {
     unsigned int try, baud, altbaud = 38400;
     int hung_up = 0;
@@ -343,7 +335,6 @@ uart_get_baud_rate(struct uart_port *port, struct ktermios *termios,
     WARN_ON(1);
     return 0;
 }
-
 /**
  *  uart_get_divisor - return uart clock divisor
  *  @port: uart_port structure describing the port.
@@ -351,8 +342,7 @@ uart_get_baud_rate(struct uart_port *port, struct ktermios *termios,
  *
  *  Calculate the uart clock divisor for the port.
  */
-unsigned int
-uart_get_divisor(struct uart_port *port, unsigned int baud)
+unsigned int uart_get_divisor(struct uart_port *port, unsigned int baud)
 {
     unsigned int quot;
 
@@ -366,7 +356,6 @@ uart_get_divisor(struct uart_port *port, unsigned int baud)
 
     return quot;
 }
-
 static const struct file_operations uart_proc_fops = {
     .owner      = THIS_MODULE,
     .open       = uart_proc_open,
@@ -374,7 +363,6 @@ static const struct file_operations uart_proc_fops = {
     .llseek     = seq_lseek,
     .release    = single_release,
 };
-
 #if defined(CONFIG_SERIAL_CORE_CONSOLE) || defined(CONFIG_CONSOLE_POLL)
 /**
  *  uart_console_write - write a console message to a serial port
@@ -402,8 +390,7 @@ EXPORT_SYMBOL_GPL(uart_console_write);
  *  if so, search for the first available port that does have
  *  console support.
  */
-struct uart_port * __init
-uart_get_console(struct uart_port *ports, int nr, struct console *co)
+struct uart_port * __init uart_get_console(struct uart_port *ports, int nr, struct console *co)
 {
     int idx = co->index;
 
@@ -476,8 +463,7 @@ int uart_parse_earlycon(char *p, unsigned char *iotype, unsigned long *addr,
  *  options.  The format of the string is <baud><parity><bits><flow>,
  *  eg: 115200n8r
  */
-void
-uart_parse_options(char *options, int *baud, int *parity, int *bits, int *flow)
+void uart_parse_options(char *options, int *baud, int *parity, int *bits, int *flow)
 {
     char *s = options;
 
@@ -521,8 +507,7 @@ static const struct baud_rates baud_rates[] = {
  *  @bits: number of data bits
  *  @flow: flow control character - 'r' (rts)
  */
-int
-uart_set_options(struct uart_port *port, struct console *co,
+int uart_set_options(struct uart_port *port, struct console *co,
          int baud, int parity, int bits, int flow)
 {
     struct ktermios termios;
@@ -592,7 +577,6 @@ struct uart_match {
     struct uart_port *port;
     struct uart_driver *driver;
 };
-
 int uart_suspend_port(struct uart_driver *drv, struct uart_port *uport)
 {
     struct uart_state *state = drv->state + uport->line;
@@ -656,7 +640,6 @@ unlock:
 
     return 0;
 }
-
 int uart_resume_port(struct uart_driver *drv, struct uart_port *uport)
 {
     struct uart_state *state = drv->state + uport->line;
@@ -740,7 +723,6 @@ int uart_resume_port(struct uart_driver *drv, struct uart_port *uport)
 
     return 0;
 }
-
 static const struct tty_operations uart_ops = {
     .open       = uart_open,
     .close      = uart_close,
@@ -773,14 +755,12 @@ static const struct tty_operations uart_ops = {
     .poll_put_char  = uart_poll_put_char,
 #endif
 };
-
 static const struct tty_port_operations uart_port_ops = {
     .activate   = uart_port_activate,
     .shutdown   = uart_port_shutdown,
     .carrier_raised = uart_carrier_raised,
     .dtr_rts    = uart_dtr_rts,
 };
-
 /**
  *  uart_register_driver - register a driver with the uart core layer
  *  @drv: low level driver structure
@@ -851,7 +831,6 @@ out_kfree:
 out:
     return -ENOMEM;
 }
-
 /**
  *  uart_unregister_driver - remove a driver from the uart core layer
  *  @drv: low level driver structure
@@ -874,7 +853,6 @@ void uart_unregister_driver(struct uart_driver *drv)
     drv->state = NULL;
     drv->tty_driver = NULL;
 }
-
 struct tty_driver *uart_console_device(struct console *co, int *index)
 {
     struct uart_driver *p = co->data;
@@ -912,11 +890,9 @@ static struct attribute *tty_dev_attrs[] = {
     &dev_attr_iomem_reg_shift.attr,
     NULL,
 };
-
 static const struct attribute_group tty_dev_attr_group = {
     .attrs = tty_dev_attrs,
 };
-
 /**
  *  uart_add_one_port - attach a driver-defined port structure
  *  @drv: pointer to the uart low level driver structure for this port
@@ -1009,7 +985,6 @@ int uart_add_one_port(struct uart_driver *drv, struct uart_port *uport)
 
     return ret;
 }
-
 /**
  *  uart_remove_one_port - detach a driver defined port structure
  *  @drv: pointer to the uart low level driver structure for this port
@@ -1082,7 +1057,6 @@ out:
 
     return ret;
 }
-
 /*
  *  Are the two ports equivalent?
  */
@@ -1106,7 +1080,6 @@ int uart_match_port(struct uart_port *port1, struct uart_port *port2)
     }
     return 0;
 }
-
 /**
  *  uart_handle_dcd_change - handle a change of carrier detect state
  *  @uport: uart_port structure for the open port
@@ -1140,7 +1113,6 @@ void uart_handle_dcd_change(struct uart_port *uport, unsigned int status)
             tty_hangup(tty);
     }
 }
-
 /**
  *  uart_handle_cts_change - handle a change of clear-to-send state
  *  @uport: uart_port structure for the open port
@@ -1170,7 +1142,6 @@ void uart_handle_cts_change(struct uart_port *uport, unsigned int status)
 
     }
 }
-
 /**
  * uart_insert_char - push a char to the uart layer
  *
@@ -1183,8 +1154,7 @@ void uart_handle_cts_change(struct uart_port *uport, unsigned int status)
  * @ch: character to push
  * @flag: flag for the character (see TTY_NORMAL and friends)
  */
-void uart_insert_char(struct uart_port *port, unsigned int status,
-         unsigned int overrun, unsigned int ch, unsigned int flag)
+void uart_insert_char(struct uart_port *port, unsigned int status, unsigned int overrun, unsigned int ch, unsigned int flag)
 {
     struct tty_port *tport = &port->state->port;
 
