@@ -37,8 +37,8 @@ struct bin_attribute {
     struct attribute    attr;
     size_t          size;
     void            *private;
-    ssize_t (*read)(struct file *, struct kobject *, struct bin_attribute *, char *, loff_t, size_t);
-    ssize_t (*write)(struct file *, struct kobject *, struct bin_attribute *, char *, loff_t, size_t);
+    ssize_t (*read)(struct file *, struct kobject *, struct bin_attribute *, char *, loff_t, size_t); // 二进制文件的读函数
+    ssize_t (*write)(struct file *, struct kobject *, struct bin_attribute *, char *, loff_t, size_t); // 二进制文件的写函数
     int (*mmap)(struct file *, struct kobject *, struct bin_attribute *attr, struct vm_area_struct *vma);
 };
     一个单独的属性结构（struct attribute或struct bin_attribute）并不包含读写其属性值的方法。子系统最好为增删特定对象类型的属性定义自己的属性结构体和封装函数。例如kobj_attribute

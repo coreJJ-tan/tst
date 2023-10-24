@@ -28,7 +28,7 @@ http://www.wowotech.net/tty_framework/tty_driver.html
 struct tty_driver {
     int magic;      /* magic number for this structure */
     struct kref kref;   /* Reference management */
-    struct cdev *cdevs;
+    struct cdev *cdevs; // 指向一个数组，每个数组成员都是 struct cdev, 指向一个 tty 字符设备, 个数是多少呢？
     struct module   *owner;
     const char  *driver_name;   // 该TTY driver的名称，在软件内部使用；
     const char  *name;  // 该 TTY driver 所驱动的 TTY devices 的名称，会体现到 sysfs 以及/dev/等文件系统下；
@@ -51,7 +51,7 @@ struct tty_driver {
     struct tty_struct **ttys; // 保存每个设备的tty_struct列表
     struct tty_port **ports;
     struct ktermios **termios;
-    void *driver_state; // 可存放tty driver的私有数据。
+    void *driver_state; // 可存放tty driver的私有数据，在 serial_core 被指定为 uart_driver
 
     /*
      * Driver methods
@@ -64,7 +64,7 @@ struct tty_driver {
     原则上来说，在编写 TTY driver 的时候，我们只需要定义一个 struct tty_driver 变量，并根据实际情况正确填充其中的字段后，注册到 TTY core 中，即可
 完成驱动的设计。
 
-1.3 TTY struct(struct tty_struct)+
+1.3 TTY struct(struct tty_struct)
     TTY struct是TTY设备在TTY core中的内部表示。
     从TTY driver的角度看，它和文件句柄的功能类似，用于指代某个TTY设备。
     从TTY core的角度看，它是一个比较复杂的数据结构，保存了TTY设备生命周期中的很多中间变量
