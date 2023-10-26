@@ -20,3 +20,10 @@ struct bin_attribute {
     ssize_t (*write)(struct file *, struct kobject *, struct bin_attribute *, char *, loff_t, size_t); // 二进制文件的写函数
     int (*mmap)(struct file *, struct kobject *, struct bin_attribute *attr, struct vm_area_struct *vma);
 };
+
+struct attribute_group {
+    const char      *name;
+    umode_t         (*is_visible)(struct kobject *, struct attribute *, int);
+    struct attribute    **attrs; // 这是个二维指针数组，attrs 的最后一个指针必须指向 NULL
+    struct bin_attribute    **bin_attrs; // bin_attrs 的最后一个指针必须指向 NULL
+};
