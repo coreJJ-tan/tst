@@ -54,4 +54,3 @@ dkms.conf
 # draw
 *.dtmp
 *.bkp
-*.drawio

@@ -70,7 +70,8 @@ struct kset {
 struct kobj_type {
     void (*release)(struct kobject *kobj); // 通过该回调函数, 可以将包含该种类型kobject的数据结构的内存空间释放掉. 
     const struct sysfs_ops *sysfs_ops; // 该种类型的Kobject的sysfs文件系统接口. 
-    struct attribute **default_attrs; // 该种类型的Kobject的atrribute列表 (所谓attribute, 就是sysfs文件系统中的一个文件) . 将会在Kobject添加到内核时, 一并注册到sysfs中. 
+    struct attribute **default_attrs; // 默认要创建的属性文件，在创建该kobject目录时就会同步创建这些文件，这对于多个 kobject 想要创建相同的属性时很重要，只要拥有同一个 
+                                      // kobj_type即可，能根据此创建，不需要冗余的代码（该成员指向的指针数组要保证最后一个指针指向NULL）
     const struct kobj_ns_type_operations *(*child_ns_type)(struct kobject *kobj); 
     const void *(*namespace)(struct kobject *kobj);
 };
