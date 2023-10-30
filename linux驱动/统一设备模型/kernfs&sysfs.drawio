@@ -1,6 +1,6 @@
-<mxfile host="Electron" modified="2023-10-27T13:45:51.897Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.6.5 Chrome/114.0.5735.243 Electron/25.3.1 Safari/537.36" etag="MCahnw4mB1EUr8Oak5cS" version="21.6.5" type="device">
+<mxfile host="Electron" modified="2023-10-30T14:20:15.193Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.6.5 Chrome/114.0.5735.243 Electron/25.3.1 Safari/537.36" etag="qGCrPKt4uOn601H38ywr" version="21.6.5" type="device">
   <diagram name="第 1 页" id="IbwBOW2PCKwNia5dKPlF">
-    <mxGraphModel dx="4530" dy="37" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="4871" dy="238" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -454,7 +454,7 @@
         <mxCell id="YR2ZOcdoz560OvKhogQO-196" value="struct attribute **default_attrs;" style="rounded=0;whiteSpace=wrap;html=1;" parent="YR2ZOcdoz560OvKhogQO-194" vertex="1">
           <mxGeometry y="60" width="200" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="mPgxJHWwVfeoTGfvAqUA-14" value="" style="endArrow=classic;html=1;rounded=0;dashed=1;strokeColor=#FF0000;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="YR2ZOcdoz560OvKhogQO-194" target="mPgxJHWwVfeoTGfvAqUA-15">
+        <mxCell id="mPgxJHWwVfeoTGfvAqUA-14" value="" style="endArrow=classic;html=1;rounded=0;dashed=1;strokeColor=#FF0000;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="YR2ZOcdoz560OvKhogQO-194" target="mPgxJHWwVfeoTGfvAqUA-15" edge="1">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
             <mxPoint x="70" y="80" as="sourcePoint" />
             <mxPoint x="-90" y="170" as="targetPoint" />
@@ -1129,7 +1129,7 @@
         <mxCell id="71enjnyxu9cjQM3RV5yC-21" value="struct attribute {" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#1ba1e2;strokeColor=#006EAF;fontColor=#ffffff;" parent="1" vertex="1">
           <mxGeometry x="300" y="1947.5" width="110" height="50" as="geometry" />
         </mxCell>
-        <mxCell id="mPgxJHWwVfeoTGfvAqUA-2" value="" style="endArrow=classic;html=1;rounded=0;dashed=1;" edge="1" parent="71enjnyxu9cjQM3RV5yC-21">
+        <mxCell id="mPgxJHWwVfeoTGfvAqUA-2" value="" style="endArrow=classic;html=1;rounded=0;dashed=1;" parent="71enjnyxu9cjQM3RV5yC-21" edge="1">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
             <mxPoint x="90" y="82.5" as="sourcePoint" />
             <mxPoint x="130" y="102.5" as="targetPoint" />
@@ -1249,88 +1249,88 @@
         <mxCell id="71enjnyxu9cjQM3RV5yC-52" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="71enjnyxu9cjQM3RV5yC-4" target="71enjnyxu9cjQM3RV5yC-36" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="mPgxJHWwVfeoTGfvAqUA-3" value="" style="endArrow=classic;html=1;rounded=0;dashed=1;" edge="1" parent="1">
+        <mxCell id="mPgxJHWwVfeoTGfvAqUA-3" value="" style="endArrow=classic;html=1;rounded=0;dashed=1;" parent="1" edge="1">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
             <mxPoint x="387.5" y="2070" as="sourcePoint" />
             <mxPoint x="430" y="2070" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="mPgxJHWwVfeoTGfvAqUA-4" value="最后一个指针指向 NULL" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+        <mxCell id="mPgxJHWwVfeoTGfvAqUA-4" value="最后一个指针指向 NULL" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="430" y="2050" width="140" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="mPgxJHWwVfeoTGfvAqUA-5" value="" style="endArrow=classic;html=1;rounded=0;dashed=1;strokeColor=#FF0000;" edge="1" parent="1">
+        <mxCell id="mPgxJHWwVfeoTGfvAqUA-5" value="" style="endArrow=classic;html=1;rounded=0;dashed=1;strokeColor=#FF0000;" parent="1" edge="1">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
             <mxPoint x="-450" y="2290" as="sourcePoint" />
             <mxPoint x="-260" y="2400" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="mPgxJHWwVfeoTGfvAqUA-6" value="" style="endArrow=classic;html=1;rounded=0;dashed=1;strokeColor=#FF0000;" edge="1" parent="1">
+        <mxCell id="mPgxJHWwVfeoTGfvAqUA-6" value="" style="endArrow=classic;html=1;rounded=0;dashed=1;strokeColor=#FF0000;" parent="1" edge="1">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
             <mxPoint x="-430" y="2400" as="sourcePoint" />
             <mxPoint x="-260" y="2410" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="mPgxJHWwVfeoTGfvAqUA-7" value="" style="endArrow=classic;html=1;rounded=0;dashed=1;strokeColor=#FF0000;" edge="1" parent="1">
+        <mxCell id="mPgxJHWwVfeoTGfvAqUA-7" value="" style="endArrow=classic;html=1;rounded=0;dashed=1;strokeColor=#FF0000;" parent="1" edge="1">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
             <mxPoint x="-430" y="2490" as="sourcePoint" />
             <mxPoint x="-260" y="2420" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="mPgxJHWwVfeoTGfvAqUA-8" value="这些类似的结构体要保证 struct attribute attr 或者struct bin_attribute battr&amp;nbsp;&lt;br&gt;成员在第一位" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+        <mxCell id="mPgxJHWwVfeoTGfvAqUA-8" value="这些类似的结构体要保证 struct attribute attr 或者struct bin_attribute battr&amp;nbsp;&lt;br&gt;成员在第一位" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="-260" y="2390" width="140" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="mPgxJHWwVfeoTGfvAqUA-10" value="" style="endArrow=classic;html=1;rounded=0;strokeColor=#FF0000;dashed=1;" edge="1" parent="1">
+        <mxCell id="mPgxJHWwVfeoTGfvAqUA-10" value="" style="endArrow=classic;html=1;rounded=0;strokeColor=#FF0000;dashed=1;" parent="1" edge="1">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
             <mxPoint x="-725" y="1960" as="sourcePoint" />
             <mxPoint x="-630" y="1960" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="mPgxJHWwVfeoTGfvAqUA-11" value="" style="endArrow=classic;html=1;rounded=0;strokeColor=#FF0000;dashed=1;" edge="1" parent="1">
+        <mxCell id="mPgxJHWwVfeoTGfvAqUA-11" value="" style="endArrow=classic;html=1;rounded=0;strokeColor=#FF0000;dashed=1;" parent="1" edge="1">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
             <mxPoint x="-720" y="1990" as="sourcePoint" />
             <mxPoint x="-630" y="1970" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="mPgxJHWwVfeoTGfvAqUA-12" value="虽然kernfs_node 的私有数据是这两个，但是只要保证其他包含这两个结构的结构体将他们放在第一个成员的位置，能能很方便的获取到其他结构体的指针，比如device_attribute 和driver_attribute 结构体等" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+        <mxCell id="mPgxJHWwVfeoTGfvAqUA-12" value="虽然kernfs_node 的私有数据是这两个，但是只要保证其他包含这两个结构的结构体将他们放在第一个成员的位置，能能很方便的获取到其他结构体的指针，比如device_attribute 和driver_attribute 结构体等" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="-627.5" y="1930" width="375" height="55" as="geometry" />
         </mxCell>
-        <mxCell id="mPgxJHWwVfeoTGfvAqUA-15" value="默认要创建的属性文件，在创建该kobject目录时就会同步创建这些文件，这对于多个 kobject 想要创建相同的属性时很重要，只要拥有同一个 kobj_type即可，能根据此创建，不需要冗余的代码（该成员指向的指针数组要保证最后一个指针指向NULL）" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
-          <mxGeometry x="-1170" y="2290" width="250" height="80" as="geometry" />
+        <mxCell id="mPgxJHWwVfeoTGfvAqUA-15" value="默认要创建的属性文件，在创建该kobject目录时就会同步创建这些文件，这对于多个 kobject 想要创建相同的属性时很重要，只要拥有同一个 kobj_type即可，能根据此创建，不需要冗余的代码（该成员指向的指针数组要保证最后一个指针指向NULL），这些 attribute 文件将在 kobject_add() 函数调用时创建。" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="-1170" y="2290" width="250" height="110" as="geometry" />
         </mxCell>
-        <mxCell id="mPgxJHWwVfeoTGfvAqUA-16" value="struct kobject {" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#0050ef;strokeColor=#001DBC;fontColor=#ffffff;" vertex="1" parent="1">
+        <mxCell id="mPgxJHWwVfeoTGfvAqUA-16" value="struct kobject {" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#0050ef;strokeColor=#001DBC;fontColor=#ffffff;" parent="1" vertex="1">
           <mxGeometry x="-1680" y="2490" width="140" height="150" as="geometry" />
         </mxCell>
-        <mxCell id="mPgxJHWwVfeoTGfvAqUA-17" value="struct list_head&#x9;entry;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="mPgxJHWwVfeoTGfvAqUA-16">
+        <mxCell id="mPgxJHWwVfeoTGfvAqUA-17" value="struct list_head&#x9;entry;" style="rounded=0;whiteSpace=wrap;html=1;" parent="mPgxJHWwVfeoTGfvAqUA-16" vertex="1">
           <mxGeometry y="30" width="140" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="mPgxJHWwVfeoTGfvAqUA-18" value="struct kset&#x9;&#x9;*kset;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="mPgxJHWwVfeoTGfvAqUA-16">
+        <mxCell id="mPgxJHWwVfeoTGfvAqUA-18" value="struct kset&#x9;&#x9;*kset;" style="rounded=0;whiteSpace=wrap;html=1;" parent="mPgxJHWwVfeoTGfvAqUA-16" vertex="1">
           <mxGeometry y="60" width="140" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="mPgxJHWwVfeoTGfvAqUA-19" value="struct kobj_type&#x9;*ktype;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="mPgxJHWwVfeoTGfvAqUA-16">
+        <mxCell id="mPgxJHWwVfeoTGfvAqUA-19" value="struct kobj_type&#x9;*ktype;" style="rounded=0;whiteSpace=wrap;html=1;" parent="mPgxJHWwVfeoTGfvAqUA-16" vertex="1">
           <mxGeometry y="90" width="140" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="mPgxJHWwVfeoTGfvAqUA-20" value="struct kobject *parent;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="mPgxJHWwVfeoTGfvAqUA-16">
+        <mxCell id="mPgxJHWwVfeoTGfvAqUA-20" value="struct kobject *parent;" style="rounded=0;whiteSpace=wrap;html=1;" parent="mPgxJHWwVfeoTGfvAqUA-16" vertex="1">
           <mxGeometry y="120" width="140" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="mPgxJHWwVfeoTGfvAqUA-21" value="" style="endArrow=classic;html=1;rounded=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1">
+        <mxCell id="mPgxJHWwVfeoTGfvAqUA-21" value="" style="endArrow=classic;html=1;rounded=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" parent="1" edge="1">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
             <mxPoint x="-1540" y="2564.6" as="sourcePoint" />
             <mxPoint x="-1490" y="2564.6" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="mPgxJHWwVfeoTGfvAqUA-22" value="NULL" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+        <mxCell id="mPgxJHWwVfeoTGfvAqUA-22" value="NULL" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="-1500" y="2550" width="60" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="mPgxJHWwVfeoTGfvAqUA-23" value="" style="endArrow=classic;html=1;rounded=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1">
+        <mxCell id="mPgxJHWwVfeoTGfvAqUA-23" value="" style="endArrow=classic;html=1;rounded=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" parent="1" edge="1">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
             <mxPoint x="-1540" y="2534.6" as="sourcePoint" />
             <mxPoint x="-1490" y="2534.6" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="mPgxJHWwVfeoTGfvAqUA-24" value="NULL" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+        <mxCell id="mPgxJHWwVfeoTGfvAqUA-24" value="NULL" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="-1500" y="2520" width="60" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="mPgxJHWwVfeoTGfvAqUA-25" value="kobject 若有 kset，则 entry 节点挂于该 kset 的 list 链表节点之下，若没有，entry 和 kset 成员均指向 NULL" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+        <mxCell id="mPgxJHWwVfeoTGfvAqUA-25" value="kobject 若有 kset，则 entry 节点挂于该 kset 的 list 链表节点之下，若没有，entry 和 kset 成员均指向 NULL" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="-1730" y="2440" width="300" height="30" as="geometry" />
         </mxCell>
       </root>

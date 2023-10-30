@@ -6,3 +6,6 @@
     配置内核是否支持SMP，SMP 即多核 CPU
 
 3、 CONFIG_SERIAL_CORE_CONSOLE
+
+4、 CONFIG_BLOCK
+    内核支持块设备
