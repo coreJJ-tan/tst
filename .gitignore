@@ -54,3 +54,6 @@ dkms.conf
 # draw
 *.dtmp
 *.bkp
+
+# test
+草稿/

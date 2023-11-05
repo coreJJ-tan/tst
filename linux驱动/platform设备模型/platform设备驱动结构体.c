@@ -47,7 +47,7 @@ struct bus_type {
     struct device       *dev_root;
     struct device_attribute *dev_attrs; /* use dev_groups instead */
     const struct attribute_group **bus_groups;      /* 总线属性 */
-    const struct attribute_group **dev_groups;      /* 设备属性 */
+    const struct attribute_group **dev_groups;      /* 设备属性 */ // 一个总线定义了这么一个属性 groups，那么当device_add()之时，该总线下的设备目录中就会创建这些groups中的属性文件
     const struct attribute_group **drv_groups;      /* 驱动属性 */
 
     int (*match)(struct device *dev, struct device_driver *drv);    // 此函数就是完成设备和驱动之间匹配的，总线就是使用 match 函数来根据注册的驱动来查找对应的设备，
