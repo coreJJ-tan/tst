@@ -1,6 +1,6 @@
-<mxfile host="Electron" modified="2023-10-30T14:20:15.193Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.6.5 Chrome/114.0.5735.243 Electron/25.3.1 Safari/537.36" etag="qGCrPKt4uOn601H38ywr" version="21.6.5" type="device">
+<mxfile host="Electron" modified="2023-11-25T13:25:06.485Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.6.5 Chrome/114.0.5735.243 Electron/25.3.1 Safari/537.36" etag="op1ds2CEeR0JzbJhoByk" version="21.6.5" type="device">
   <diagram name="第 1 页" id="IbwBOW2PCKwNia5dKPlF">
-    <mxGraphModel dx="4871" dy="238" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="3847" dy="-365" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -413,15 +413,16 @@
         <mxCell id="YR2ZOcdoz560OvKhogQO-187" value="&lt;font color=&quot;#ff0000&quot;&gt;一个 kobject 代表 sysfs 下的一个目录&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="-1870" y="2230" width="220" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="YR2ZOcdoz560OvKhogQO-188" value="" style="edgeStyle=orthogonalEdgeStyle;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;curved=1;" parent="1" target="YR2ZOcdoz560OvKhogQO-183" edge="1">
+        <mxCell id="YR2ZOcdoz560OvKhogQO-188" value="" style="edgeStyle=orthogonalEdgeStyle;orthogonalLoop=1;jettySize=auto;html=1;curved=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" parent="1" target="YR2ZOcdoz560OvKhogQO-183" edge="1" source="YR2ZOcdoz560OvKhogQO-179">
           <mxGeometry relative="1" as="geometry">
-            <mxPoint x="-1670" y="2155" as="sourcePoint" />
+            <mxPoint x="-1670" y="2190" as="sourcePoint" />
             <Array as="points">
-              <mxPoint x="-1650" y="2155" />
-              <mxPoint x="-1650" y="2210" />
-              <mxPoint x="-1890" y="2210" />
-              <mxPoint x="-1890" y="2305" />
+              <mxPoint x="-1650" y="2185" />
+              <mxPoint x="-1650" y="2220" />
+              <mxPoint x="-1910" y="2220" />
+              <mxPoint x="-1910" y="2305" />
             </Array>
+            <mxPoint x="-1889.3" y="2300.79" as="targetPoint" />
           </mxGeometry>
         </mxCell>
         <mxCell id="YR2ZOcdoz560OvKhogQO-189" value="" style="endArrow=classic;html=1;rounded=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" parent="1" source="YR2ZOcdoz560OvKhogQO-183" target="YR2ZOcdoz560OvKhogQO-163" edge="1">
@@ -1332,6 +1333,22 @@
         </mxCell>
         <mxCell id="mPgxJHWwVfeoTGfvAqUA-25" value="kobject 若有 kset，则 entry 节点挂于该 kset 的 list 链表节点之下，若没有，entry 和 kset 成员均指向 NULL" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="-1730" y="2440" width="300" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ZQx8FBsULFBKmosmaCTB-1" value="struct kobject {" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#0050ef;strokeColor=#001DBC;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="-1620" y="2100" width="140" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="ZQx8FBsULFBKmosmaCTB-2" value="..." style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="ZQx8FBsULFBKmosmaCTB-1">
+          <mxGeometry y="30" width="140" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ZQx8FBsULFBKmosmaCTB-6" value="" style="endArrow=classic;html=1;rounded=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" edge="1" parent="1" target="ZQx8FBsULFBKmosmaCTB-1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="-1670" y="2160" as="sourcePoint" />
+            <mxPoint x="-1620" y="2110" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="-1650" y="2160" />
+              <mxPoint x="-1650" y="2115" />
+            </Array>
+          </mxGeometry>
         </mxCell>
       </root>
     </mxGraphModel>

@@ -285,10 +285,123 @@ struct bus_type {
 	struct lock_class_key lock_key;
 };
 
+/**
+ * struct subsys_private - structure to hold the private to the driver core portions of the bus_type/class structure.
+ *
+ * @subsys - the struct kset that defines this subsystem
+ * @devices_kset - the subsystem's 'devices' directory
+ * @interfaces - list of subsystem interfaces associated
+ * @mutex - protect the devices, and interfaces lists.
+ *
+ * @drivers_kset - the list of drivers associated
+ * @klist_devices - the klist to iterate over the @devices_kset
+ * @klist_drivers - the klist to iterate over the @drivers_kset
+ * @bus_notifier - the bus notifier list for anything that cares about things
+ *                 on this bus.
+ * @bus - pointer back to the struct bus_type that this structure is associated
+ *        with.
+ *
+ * @glue_dirs - "glue" directory to put in-between the parent device to
+ *              avoid namespace conflicts
+ * @class - pointer back to the struct class that this structure is associated
+ *          with.
+ *
+ * This structure is the one that is the actual kobject allowing struct
+ * bus_type/class to be statically allocated safely.  Nothing outside of the
+ * driver core should ever touch these fields.
+ */
+struct subsys_private {
+    struct kset subsys;
+    struct kset *devices_kset;
+    struct list_head interfaces;
+    struct mutex mutex;
+
+    struct kset *drivers_kset;
+    struct klist klist_devices;
+    struct klist klist_drivers;
+    struct blocking_notifier_head bus_notifier;
+    unsigned int drivers_autoprobe:1;
+    struct bus_type *bus;
+
+    struct kset glue_dirs;
+    struct class *class;
+};
+
+
 struct subsys_interface {
 	const char *name;
 	struct bus_type *subsys;
 	struct list_head node;
 	int (*add_dev)(struct device *dev, struct subsys_interface *sif);
 	int (*remove_dev)(struct device *dev, struct subsys_interface *sif);
+};
+
+
+/**
+ * struct device_driver - The basic device driver structure
+ * @name:   Name of the device driver.
+ * @bus:    The bus which the device of this driver belongs to.
+ * @owner:  The module owner.
+ * @mod_name:   Used for built-in modules.
+ * @suppress_bind_attrs: Disables bind/unbind via sysfs.
+ * @of_match_table: The open firmware table.
+ * @acpi_match_table: The ACPI match table.
+ * @probe:  Called to query the existence of a specific device,
+ *      whether this driver can work with it, and bind the driver
+ *      to a specific device.
+ * @remove: Called when the device is removed from the system to
+ *      unbind a device from this driver.
+ * @shutdown:   Called at shut-down time to quiesce the device.
+ * @suspend:    Called to put the device to sleep mode. Usually to a
+ *      low power state.
+ * @resume: Called to bring a device from sleep mode.
+ * @groups: Default attributes that get created by the driver core
+ *      automatically.
+ * @pm:     Power management operations of the device which matched
+ *      this driver.
+ * @p:      Driver core's private data, no one other than the driver
+ *      core can touch this.
+ *
+ * The device driver-model tracks all of the drivers known to the system.
+ * The main reason for this tracking is to enable the driver core to match
+ * up drivers with new devices. Once drivers are known objects within the
+ * system, however, a number of other things become possible. Device drivers
+ * can export information and configuration variables that are independent
+ * of any specific device.
+ */
+struct device_driver {
+    const char      *name; // 该driver的名称.
+    struct bus_type     *bus; // 该driver所驱动设备的总线设备.为什么driver需要记录总线设备的指针呢？因为内核要保证在driver运行前, 设备所依赖的总线能够正确初始化.
+    struct module       *owner; // 內核module相关的变量, 暂不描述.
+    const char      *mod_name;  // 內核module相关的变量, 暂不描述./* used for built-in modules */
+    bool suppress_bind_attrs;   // 是不在sysfs中启用bind和unbind attribute, 如下: /* disables bind/unbind via sysfs */
+                                // root@android:/storage/sdcard0 # ls /sys/bus/platform/drivers/switch-gpio/                                                  
+                                // bind   uevent unbind
+                                // 在kernel中, bind/unbind是从用户空间手动的为driver绑定/解绑定指定的设备的机制.这种机制是在bus.c中完成的
+    const struct of_device_id   *of_match_table;
+    const struct acpi_device_id *acpi_match_table;
+    int (*probe) (struct device *dev); // probe、remove, 这两个接口函数用于实现driver逻辑的开始和结束
+    int (*remove) (struct device *dev);
+    void (*shutdown) (struct device *dev); // shutdown、suspend、resume、pm, 电源管理相关的内容, 会在电源管理专题中详细说明.
+    int (*suspend) (struct device *dev, pm_message_t state);
+    int (*resume) (struct device *dev);
+    const struct attribute_group **groups; // 和struct device结构中的同名变量类似, driver也可以定义一些默认attribute, 这样在将driver注册到内核中时, 内核设备模型
+                                           // 部分的代码(driver/base/driver.c)会自动将这些attribute添加到sysfs中.
+    const struct dev_pm_ops *pm;
+    struct driver_private *p; // driver core的私有数据指针, 其它模块不能访问.
+};
+
+struct driver_private {
+    struct kobject kobj; // 该设备驱动对应的 kobject
+    struct klist klist_devices;
+    struct klist_node knode_bus;
+    struct module_kobject *mkobj;
+    struct device_driver *driver;
+};
+
+struct driver_attribute {
+	struct attribute attr;
+	ssize_t (*show)(struct device_driver *driver, char *buf);
+	ssize_t (*store)(struct device_driver *driver, const char *buf,
+			 size_t count);
 };
