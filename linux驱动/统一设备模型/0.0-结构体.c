@@ -137,58 +137,6 @@ struct device_type {
 };
 
 /**
- * struct class - device classes
- * @name:	Name of the class.
- * @owner:	The module owner.
- * @class_attrs: Default attributes of this class.
- * @dev_groups:	Default attributes of the devices that belong to the class.
- * @dev_kobj:	The kobject that represents this class and links it into the hierarchy.
- * @dev_uevent:	Called when a device is added, removed from this class, or a
- *		few other things that generate uevents to add the environment
- *		variables.
- * @devnode:	Callback to provide the devtmpfs.
- * @class_release: Called to release this class.
- * @dev_release: Called to release the device.
- * @suspend:	Used to put the device to sleep mode, usually to a low power
- *		state.
- * @resume:	Used to bring the device from the sleep mode.
- * @ns_type:	Callbacks so sysfs can detemine namespaces.
- * @namespace:	Namespace of the device belongs to this class.
- * @pm:		The default device power management operations of this class.
- * @p:		The private data of the driver core, no one other than the
- *		driver core can touch this.
- *
- * A class is a higher-level view of a device that abstracts out low-level
- * implementation details. Drivers may see a SCSI disk or an ATA disk, but,
- * at the class level, they are all simply disks. Classes allow user space
- * to work with devices based on what they do, rather than how they are
- * connected or how they work.
- */
-struct class {
-	const char		*name;
-	struct module		*owner;
-
-	struct class_attribute		*class_attrs;
-	const struct attribute_group	**dev_groups;
-	struct kobject			*dev_kobj;
-
-	int (*dev_uevent)(struct device *dev, struct kobj_uevent_env *env);
-	char *(*devnode)(struct device *dev, umode_t *mode);
-
-	void (*class_release)(struct class *class);
-	void (*dev_release)(struct device *dev);
-
-	int (*suspend)(struct device *dev, pm_message_t state);
-	int (*resume)(struct device *dev);
-
-	const struct kobj_ns_type_operations *ns_type;
-	const void *(*namespace)(struct device *dev);
-
-	const struct dev_pm_ops *pm;
-
-	struct subsys_private *p;
-};
-/**
  * struct device_private - structure to hold the private to the driver core portions of the device structure.
  *
  * @klist_children - klist containing all children of this device
@@ -212,121 +160,6 @@ struct device_private {
     struct list_head deferred_probe;
     struct device *device;
 };
-
-/**
- * struct bus_type - The bus type of the device
- *
- * @name:	The name of the bus.
- * @dev_name:	Used for subsystems to enumerate devices like ("foo%u", dev->id).
- * @dev_root:	Default device to use as the parent.
- * @dev_attrs:	Default attributes of the devices on the bus.
- * @bus_groups:	Default attributes of the bus.
- * @dev_groups:	Default attributes of the devices on the bus.
- * @drv_groups: Default attributes of the device drivers on the bus.
- * @match:	Called, perhaps multiple times, whenever a new device or driver
- *		is added for this bus. It should return a nonzero value if the
- *		given device can be handled by the given driver.
- * @uevent:	Called when a device is added, removed, or a few other things
- *		that generate uevents to add the environment variables.
- * @probe:	Called when a new device or driver add to this bus, and callback
- *		the specific driver's probe to initial the matched device.
- * @remove:	Called when a device removed from this bus.
- * @shutdown:	Called at shut-down time to quiesce the device.
- *
- * @online:	Called to put the device back online (after offlining it).
- * @offline:	Called to put the device offline for hot-removal. May fail.
- *
- * @suspend:	Called when a device on this bus wants to go to sleep mode.
- * @resume:	Called to bring a device on this bus out of sleep mode.
- * @pm:		Power management operations of this bus, callback the specific
- *		device driver's pm-ops.
- * @iommu_ops:  IOMMU specific operations for this bus, used to attach IOMMU
- *              driver implementations to a bus and allow the driver to do
- *              bus-specific setup
- * @p:		The private data of the driver core, only the driver core can
- *		touch this.
- * @lock_key:	Lock class key for use by the lock validator
- *
- * A bus is a channel between the processor and one or more devices. For the
- * purposes of the device model, all devices are connected via a bus, even if
- * it is an internal, virtual, "platform" bus. Buses can plug into each other.
- * A USB controller is usually a PCI device, for example. The device model
- * represents the actual connections between buses and the devices they control.
- * A bus is represented by the bus_type structure. It contains the name, the
- * default attributes, the bus' methods, PM operations, and the driver core's
- * private data.
- */
-struct bus_type {
-	const char		*name;
-	const char		*dev_name;
-	struct device		*dev_root;
-	struct device_attribute	*dev_attrs;	/* use dev_groups instead */
-	const struct attribute_group **bus_groups;
-	const struct attribute_group **dev_groups;
-	const struct attribute_group **drv_groups;
-
-	int (*match)(struct device *dev, struct device_driver *drv);
-	int (*uevent)(struct device *dev, struct kobj_uevent_env *env);
-	int (*probe)(struct device *dev);
-	int (*remove)(struct device *dev);
-	void (*shutdown)(struct device *dev);
-
-	int (*online)(struct device *dev);
-	int (*offline)(struct device *dev);
-
-	int (*suspend)(struct device *dev, pm_message_t state);
-	int (*resume)(struct device *dev);
-
-	const struct dev_pm_ops *pm;
-
-	const struct iommu_ops *iommu_ops;
-
-	struct subsys_private *p;
-	struct lock_class_key lock_key;
-};
-
-/**
- * struct subsys_private - structure to hold the private to the driver core portions of the bus_type/class structure.
- *
- * @subsys - the struct kset that defines this subsystem
- * @devices_kset - the subsystem's 'devices' directory
- * @interfaces - list of subsystem interfaces associated
- * @mutex - protect the devices, and interfaces lists.
- *
- * @drivers_kset - the list of drivers associated
- * @klist_devices - the klist to iterate over the @devices_kset
- * @klist_drivers - the klist to iterate over the @drivers_kset
- * @bus_notifier - the bus notifier list for anything that cares about things
- *                 on this bus.
- * @bus - pointer back to the struct bus_type that this structure is associated
- *        with.
- *
- * @glue_dirs - "glue" directory to put in-between the parent device to
- *              avoid namespace conflicts
- * @class - pointer back to the struct class that this structure is associated
- *          with.
- *
- * This structure is the one that is the actual kobject allowing struct
- * bus_type/class to be statically allocated safely.  Nothing outside of the
- * driver core should ever touch these fields.
- */
-struct subsys_private {
-    struct kset subsys;
-    struct kset *devices_kset;
-    struct list_head interfaces;
-    struct mutex mutex;
-
-    struct kset *drivers_kset;
-    struct klist klist_devices;
-    struct klist klist_drivers;
-    struct blocking_notifier_head bus_notifier;
-    unsigned int drivers_autoprobe:1;
-    struct bus_type *bus;
-
-    struct kset glue_dirs;
-    struct class *class;
-};
-
 
 struct subsys_interface {
 	const char *name;
@@ -404,4 +237,177 @@ struct driver_attribute {
 	ssize_t (*show)(struct device_driver *driver, char *buf);
 	ssize_t (*store)(struct device_driver *driver, const char *buf,
 			 size_t count);
+};
+
+
+/**
+ * struct bus_type - The bus type of the device
+ *
+ * @name:	The name of the bus.
+ * @dev_name:	Used for subsystems to enumerate devices like ("foo%u", dev->id).
+ * @dev_root:	Default device to use as the parent.
+ * @dev_attrs:	Default attributes of the devices on the bus.
+ * @bus_groups:	Default attributes of the bus.
+ * @dev_groups:	Default attributes of the devices on the bus.
+ * @drv_groups: Default attributes of the device drivers on the bus.
+ * @match:	Called, perhaps multiple times, whenever a new device or driver
+ *		is added for this bus. It should return a nonzero value if the
+ *		given device can be handled by the given driver.
+ * @uevent:	Called when a device is added, removed, or a few other things
+ *		that generate uevents to add the environment variables.
+ * @probe:	Called when a new device or driver add to this bus, and callback
+ *		the specific driver's probe to initial the matched device.
+ * @remove:	Called when a device removed from this bus.
+ * @shutdown:	Called at shut-down time to quiesce the device.
+ *
+ * @online:	Called to put the device back online (after offlining it).
+ * @offline:	Called to put the device offline for hot-removal. May fail.
+ *
+ * @suspend:	Called when a device on this bus wants to go to sleep mode.
+ * @resume:	Called to bring a device on this bus out of sleep mode.
+ * @pm:		Power management operations of this bus, callback the specific
+ *		device driver's pm-ops.
+ * @iommu_ops:  IOMMU specific operations for this bus, used to attach IOMMU
+ *              driver implementations to a bus and allow the driver to do
+ *              bus-specific setup
+ * @p:		The private data of the driver core, only the driver core can
+ *		touch this.
+ * @lock_key:	Lock class key for use by the lock validator
+ *
+ * A bus is a channel between the processor and one or more devices. For the
+ * purposes of the device model, all devices are connected via a bus, even if
+ * it is an internal, virtual, "platform" bus. Buses can plug into each other.
+ * A USB controller is usually a PCI device, for example. The device model
+ * represents the actual connections between buses and the devices they control.
+ * A bus is represented by the bus_type structure. It contains the name, the
+ * default attributes, the bus' methods, PM operations, and the driver core's
+ * private data.
+ */
+struct bus_type {
+	const char		*name;
+	const char		*dev_name;
+	struct device		*dev_root;
+	struct device_attribute	*dev_attrs;	// 这是一个数组, 所有挂在该总线上的设备都会在 bus_add_device() 阶段创建这个数组中的所有属性文件, 这个数组的最后一个成员要保持为 __ATTR_NULL /* use dev_groups instead */
+	const struct attribute_group **bus_groups;
+	const struct attribute_group **dev_groups; // 这是一个数组, 所有挂在该总线上的设备都会在 bus_add_device() 阶段创建这个数组中的所有组的属性文件
+	const struct attribute_group **drv_groups;
+
+	int (*match)(struct device *dev, struct device_driver *drv);
+	int (*uevent)(struct device *dev, struct kobj_uevent_env *env);
+	int (*probe)(struct device *dev);
+	int (*remove)(struct device *dev);
+	void (*shutdown)(struct device *dev);
+
+	int (*online)(struct device *dev);
+	int (*offline)(struct device *dev);
+
+	int (*suspend)(struct device *dev, pm_message_t state);
+	int (*resume)(struct device *dev);
+
+	const struct dev_pm_ops *pm;
+
+	const struct iommu_ops *iommu_ops;
+
+	struct subsys_private *p;
+	struct lock_class_key lock_key;
+};
+struct bus_attribute {
+    struct attribute    attr;
+    ssize_t (*show)(struct bus_type *bus, char *buf);
+    ssize_t (*store)(struct bus_type *bus, const char *buf, size_t count);
+};
+
+/**
+ * struct class - device classes
+ * @name:	Name of the class.
+ * @owner:	The module owner.
+ * @class_attrs: Default attributes of this class.
+ * @dev_groups:	Default attributes of the devices that belong to the class.
+ * @dev_kobj:	The kobject that represents this class and links it into the hierarchy.
+ * @dev_uevent:	Called when a device is added, removed from this class, or a
+ *		few other things that generate uevents to add the environment
+ *		variables.
+ * @devnode:	Callback to provide the devtmpfs.
+ * @class_release: Called to release this class.
+ * @dev_release: Called to release the device.
+ * @suspend:	Used to put the device to sleep mode, usually to a low power
+ *		state.
+ * @resume:	Used to bring the device from the sleep mode.
+ * @ns_type:	Callbacks so sysfs can detemine namespaces.
+ * @namespace:	Namespace of the device belongs to this class.
+ * @pm:		The default device power management operations of this class.
+ * @p:		The private data of the driver core, no one other than the
+ *		driver core can touch this.
+ *
+ * A class is a higher-level view of a device that abstracts out low-level
+ * implementation details. Drivers may see a SCSI disk or an ATA disk, but,
+ * at the class level, they are all simply disks. Classes allow user space
+ * to work with devices based on what they do, rather than how they are
+ * connected or how they work.
+ */
+struct class {
+	const char		*name;
+	struct module		*owner;
+
+	struct class_attribute		*class_attrs;
+	const struct attribute_group	**dev_groups;
+	struct kobject			*dev_kobj;
+
+	int (*dev_uevent)(struct device *dev, struct kobj_uevent_env *env);
+	char *(*devnode)(struct device *dev, umode_t *mode);
+
+	void (*class_release)(struct class *class);
+	void (*dev_release)(struct device *dev);
+
+	int (*suspend)(struct device *dev, pm_message_t state);
+	int (*resume)(struct device *dev);
+
+	const struct kobj_ns_type_operations *ns_type;
+	const void *(*namespace)(struct device *dev);
+
+	const struct dev_pm_ops *pm;
+
+	struct subsys_private *p;
+};
+
+/**
+ * struct subsys_private - structure to hold the private to the driver core portions of the bus_type/class structure.
+ *
+ * @subsys - the struct kset that defines this subsystem
+ * @devices_kset - the subsystem's 'devices' directory
+ * @interfaces - list of subsystem interfaces associated
+ * @mutex - protect the devices, and interfaces lists.
+ *
+ * @drivers_kset - the list of drivers associated
+ * @klist_devices - the klist to iterate over the @devices_kset
+ * @klist_drivers - the klist to iterate over the @drivers_kset
+ * @bus_notifier - the bus notifier list for anything that cares about things
+ *                 on this bus.
+ * @bus - pointer back to the struct bus_type that this structure is associated
+ *        with.
+ *
+ * @glue_dirs - "glue" directory to put in-between the parent device to
+ *              avoid namespace conflicts
+ * @class - pointer back to the struct class that this structure is associated
+ *          with.
+ *
+ * This structure is the one that is the actual kobject allowing struct
+ * bus_type/class to be statically allocated safely.  Nothing outside of the
+ * driver core should ever touch these fields.
+ */
+struct subsys_private { // 这个结构体被 bus_type/class 两个结构体包含, 代表这两个大结构体的私有部分
+    struct kset subsys; // 代表 bus_type/class 自己子系统的 kset，会根据这个成员的 subsys->kobj->entry 链表连接所有的 bus/class ?
+    struct kset *devices_kset; // 该 bus_type/class 下的设备的共有 kset，其下的设备会以 devices_kset-> list 作为头部, 将它们 kobject 链接到这个链表头上
+    struct list_head interfaces;
+    struct mutex mutex;
+
+    struct kset *drivers_kset; // 该 bus_type/class 下的驱动的共有 kset，其下的驱动会以 devices_kset-> list 作为头部, 将它们 kobject 链接到这个链表头上
+    struct klist klist_devices;
+    struct klist klist_drivers;
+    struct blocking_notifier_head bus_notifier;
+    unsigned int drivers_autoprobe:1;
+    struct bus_type *bus;
+
+    struct kset glue_dirs;
+    struct class *class;
 };

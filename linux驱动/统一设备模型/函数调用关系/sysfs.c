@@ -178,7 +178,7 @@ void sysfs_remove_link_from_group(struct kobject *kobj, const char *group_name, 
 }
 
 // link篇
-int sysfs_create_link(struct kobject *kobj, struct kobject *target, const char *name) // 在kobj目录下创建指向target目录的软链接，name为软链接文件名称。
+int sysfs_create_link(struct kobject *kobj, struct kobject *target, const char *name) // 在 kobj 目录下创建指向 target 目录的软链接，name为软链接文件名称。
 {
     return sysfs_do_create_link(kobj, target, name, 1);
 }
