@@ -161,15 +161,6 @@ struct device_private {
     struct device *device;
 };
 
-struct subsys_interface {
-	const char *name;
-	struct bus_type *subsys;
-	struct list_head node;
-	int (*add_dev)(struct device *dev, struct subsys_interface *sif);
-	int (*remove_dev)(struct device *dev, struct subsys_interface *sif);
-};
-
-
 /**
  * struct device_driver - The basic device driver structure
  * @name:   Name of the device driver.
@@ -288,7 +279,7 @@ struct bus_type {
 	const char		*dev_name;
 	struct device		*dev_root;
 	struct device_attribute	*dev_attrs;	// 这是一个数组, 所有挂在该总线上的设备都会在 bus_add_device() 阶段创建这个数组中的所有属性文件, 这个数组的最后一个成员要保持为 __ATTR_NULL /* use dev_groups instead */
-	const struct attribute_group **bus_groups;
+	const struct attribute_group **bus_groups; // 这是一个数组, 该成员指定的所有属性文件将会在 bus_register() 函数中被创建于总线的目录下
 	const struct attribute_group **dev_groups; // 这是一个数组, 所有挂在该总线上的设备都会在 bus_add_device() 阶段创建这个数组中的所有组的属性文件
 	const struct attribute_group **drv_groups;
 
@@ -398,16 +389,24 @@ struct class {
 struct subsys_private { // 这个结构体被 bus_type/class 两个结构体包含, 代表这两个大结构体的私有部分
     struct kset subsys; // 代表 bus_type/class 自己子系统的 kset，会根据这个成员的 subsys->kobj->entry 链表连接所有的 bus/class ?
     struct kset *devices_kset; // 该 bus_type/class 下的设备的共有 kset，其下的设备会以 devices_kset-> list 作为头部, 将它们 kobject 链接到这个链表头上
-    struct list_head interfaces;
+    struct list_head interfaces; // 链表头部，链接的节点是 subsys_interface->node
     struct mutex mutex;
 
     struct kset *drivers_kset; // 该 bus_type/class 下的驱动的共有 kset，其下的驱动会以 devices_kset-> list 作为头部, 将它们 kobject 链接到这个链表头上
-    struct klist klist_devices;
-    struct klist klist_drivers;
+    struct klist klist_devices; // klist 链表的头部，其下会链接多个设备
+    struct klist klist_drivers; // klist 链表的头部，其下会链接多个驱动
     struct blocking_notifier_head bus_notifier;
-    unsigned int drivers_autoprobe:1;
+    unsigned int drivers_autoprobe:1; /*drivers_autoprobe是一个bit变量,为l则允许本条总线上的device注册时自动匹配driver,drivers_autoprobe默认总是为1,除非用户空间修改*/
     struct bus_type *bus;
 
     struct kset glue_dirs;
     struct class *class;
+};
+
+struct subsys_interface {
+	const char *name;
+	struct bus_type *subsys; // 所属的总线
+	struct list_head node; // 通过该节点挂在 subsys->p->interfaces 链表之上
+	int (*add_dev)(struct device *dev, struct subsys_interface *sif);
+	int (*remove_dev)(struct device *dev, struct subsys_interface *sif);
 };
