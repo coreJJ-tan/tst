@@ -140,9 +140,9 @@
         klist_add_tail(&dev->p->knode_bus, &bus->p->klist_devices);
     (11) // 调用 dpm_sysfs_add() device_pm_add() , 以后再研究吧
     (12) 如果该函数调用之前指定了设备号(即设备号不为 0):
-            在该设备的目录下创建 "dev" 属性文件, 可通过该文件查看设备号
-            在 "/sys/dev/char/" 目录下创建软链接，指向当前 device 的目录, 软链接名字格式为 "主设备号:子设备号"
-            创建该设备在 /dev 目录下的文件节点 // devtmpfs_create_node(dev);
+            a. 在该设备的目录下创建 "dev" 属性文件, 可通过该文件查看设备号
+            b. 在 "/sys/dev/char/" 目录下创建软链接，指向当前 device 的目录, 软链接名字格式为 "主设备号:子设备号"
+            c. 创建该设备在 /dev 目录下的文件节点 // devtmpfs_create_node(dev);
     (13) // 如果设备有 bus, 调用 blocking_notifier_call_chain(&dev->bus->p->bus_notifier, BUS_NOTIFY_ADD_DEVICE, dev);
     (14) // 调用 kobject_uevent(&dev->kobj, KOBJ_ADD);
     (15) // 调用 bus_probe_device(dev);

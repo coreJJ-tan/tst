@@ -277,7 +277,7 @@ struct driver_attribute {
 struct bus_type {
 	const char		*name;
 	const char		*dev_name;
-	struct device		*dev_root;
+	struct device		*dev_root; // 如果该总线被当成一个设备，那么该成员就指向了它的设备结构体（参见 subsys_register()函数）
 	struct device_attribute	*dev_attrs;	// 这是一个数组, 所有挂在该总线上的设备都会在 bus_add_device() 阶段创建这个数组中的所有属性文件, 这个数组的最后一个成员要保持为 __ATTR_NULL /* use dev_groups instead */
 	const struct attribute_group **bus_groups; // 这是一个数组, 该成员指定的所有属性文件将会在 bus_register() 函数中被创建于总线的目录下
 	const struct attribute_group **dev_groups; // 这是一个数组, 所有挂在该总线上的设备都会在 bus_add_device() 阶段创建这个数组中的所有组的属性文件
@@ -395,7 +395,7 @@ struct subsys_private { // 这个结构体被 bus_type/class 两个结构体包�
     struct kset *drivers_kset; // 该 bus_type/class 下的驱动的共有 kset，其下的驱动会以 devices_kset-> list 作为头部, 将它们 kobject 链接到这个链表头上
     struct klist klist_devices; // klist 链表的头部，其下会链接多个设备
     struct klist klist_drivers; // klist 链表的头部，其下会链接多个驱动
-    struct blocking_notifier_head bus_notifier;
+    struct blocking_notifier_head bus_notifier; // 该总线的通知链表头，挂在总线上的设备或者驱动可以注册通知链挂到上面，用于监听总线上发生的事（通过bus_unregister_notifier()注册）
     unsigned int drivers_autoprobe:1; /*drivers_autoprobe是一个bit变量,为l则允许本条总线上的device注册时自动匹配driver,drivers_autoprobe默认总是为1,除非用户空间修改*/
     struct bus_type *bus;
 
