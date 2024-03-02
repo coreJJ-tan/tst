@@ -49,7 +49,7 @@ struct bin_attribute {
 4、attribute文件的创建
     看到 struct attribute 结构体，可能会有疑问，该接口没有read或者write接口，那么attribute文件的操作是怎么进行的呢？
     其实，所有需要使用attribute的模块，都不会直接定义struct attribute变量，而是通过一个自定义的数据结构，该数据结构的一个成员是struct attribute类型的变量，并提供show和store回调
-函数。然后在该模块ktype所对应的struct sysfs_ops变量中，实现该本模块整体的show和store函数，并在被调用时，转接到自定义数据结构（struct class_attribute）中的show和store函数中。这
+函数。然后在该模块ktype所对应的struct sysfs_ops变量中，实现该本模块整体的show和store函数，并在被调用时，转接到自定义数据结构（如 struct class_attribute）中的show和store函数中。这
 样，每个atrribute文件，实际上对应到一个自定义数据结构变量中了。
 
 

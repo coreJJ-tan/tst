@@ -307,6 +307,13 @@ struct bus_attribute {
     ssize_t (*show)(struct bus_type *bus, char *buf);
     ssize_t (*store)(struct bus_type *bus, const char *buf, size_t count);
 };
+struct subsys_interface {
+	const char *name;
+	struct bus_type *subsys; // 所属的总线
+	struct list_head node; // 通过该节点挂在 subsys->p->interfaces 链表之上
+	int (*add_dev)(struct device *dev, struct subsys_interface *sif);
+	int (*remove_dev)(struct device *dev, struct subsys_interface *sif);
+};
 
 /**
  * struct class - device classes
@@ -340,9 +347,9 @@ struct class {
 	const char		*name;
 	struct module		*owner;
 
-	struct class_attribute		*class_attrs;
+	struct class_attribute		*class_attrs; // 该类在注册时创建的一些属性文件, 指向一个数组, 数组最后一个成员保持为 __ATTR_NULL 
 	const struct attribute_group	**dev_groups;
-	struct kobject			*dev_kobj;
+	struct kobject			*dev_kobj; // 对应 /sys/dev/char 或者 /sys/dev/block,注册class时如果未指定，那么默认为 /sys/dev/char
 
 	int (*dev_uevent)(struct device *dev, struct kobj_uevent_env *env);
 	char *(*devnode)(struct device *dev, umode_t *mode);
@@ -359,6 +366,11 @@ struct class {
 	const struct dev_pm_ops *pm;
 
 	struct subsys_private *p;
+};
+struct class_attribute {
+	struct attribute attr;
+	ssize_t (*show)(struct class *class, struct class_attribute *attr, char *buf);
+	ssize_t (*store)(struct class *class, struct class_attribute *attr, const char *buf, size_t count);
 };
 
 /**
@@ -401,12 +413,4 @@ struct subsys_private { // 这个结构体被 bus_type/class 两个结构体包�
 
     struct kset glue_dirs;
     struct class *class;
-};
-
-struct subsys_interface {
-	const char *name;
-	struct bus_type *subsys; // 所属的总线
-	struct list_head node; // 通过该节点挂在 subsys->p->interfaces 链表之上
-	int (*add_dev)(struct device *dev, struct subsys_interface *sif);
-	int (*remove_dev)(struct device *dev, struct subsys_interface *sif);
 };
