@@ -1,0 +1,1 @@
+1. 整个 ext4 的初始化入口为 static int __init ext4_init_fs(void)

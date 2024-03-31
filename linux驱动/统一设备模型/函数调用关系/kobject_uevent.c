@@ -71,26 +71,26 @@ int kobject_uevent_env(struct kobject *kobj, enum kobject_action action, char *e
 	const struct kset_uevent_ops *uevent_ops;
 	int i = 0;
 	int retval = 0;
-    #ifdef CONFIG_NET   // CONFIG_NET表示是否支持网络，一般都是支持的
+    #ifdef CONFIG_NET   // CONFIG_NET表示是否支持网络, 一般都是支持的
         struct uevent_sock *ue_sk;
     #endif
 	top_kobj = kobj;/* search the kset we belong to */ 
 	while(!top_kobj->kset && top_kobj->parent) // 找到距离本kobj血缘最近的kset
-		top_kobj = top_kobj->parent;	// 如果本kobj不属于任何的kset，就找父亲的kset
+		top_kobj = top_kobj->parent;	// 如果本kobj不属于任何的kset, 就找父亲的kset
 	if (!top_kobj->kset)	// 
-		return -EINVAL; // 如果本kobj及其祖宗都没有kset，那么报错返回，由此可说明，如果一个kobject没有加入kset，是不允许上报uevent的
+		return -EINVAL; // 如果本kobj及其祖宗都没有kset, 那么报错返回, 由此可说明, 如果一个kobject没有加入kset, 是不允许上报uevent的
 	kset = top_kobj->kset; // kset存在是继续往下走的前提
 	uevent_ops = kset->uevent_ops;
 	if (kobj->uevent_suppress) // 如果kobj->uevent_suppress为1, 则表示忽略所有上报的uevent事件. 
 		return 0; // pr_debug("kobject: '%s' (%p): %s: uevent_suppress caused the event to drop!\n", kobject_name(kobj), kobj, __func__);
 	if (uevent_ops && uevent_ops->filter) /* skip the event, if the filter returns zero. */
-		if (!uevent_ops->filter(kset, kobj)) // 如果filter()函数执行返回0，则表明跳过本次uevent事件上报
+		if (!uevent_ops->filter(kset, kobj)) // 如果filter()函数执行返回0, 则表明跳过本次uevent事件上报
 			return 0; // pr_debug("kobject: '%s' (%p): %s: filter function caused the event to drop!\n", kobject_name(kobj), kobj, __func__);
 	if (uevent_ops && uevent_ops->name) /* originating subsystem */
 		subsystem = uevent_ops->name(kset, kobj);
 	else
 		subsystem = kobject_name(&kset->kobj);
-	if (!subsystem) // 判断所属的kset是否有合法的名称，名字设置不合法，则跳过该事件
+	if (!subsystem) // 判断所属的kset是否有合法的名称, 名字设置不合法, 则跳过该事件
 		return 0; // pr_debug("kobject: '%s' (%p): %s: unset subsystem caused the event to drop!\n", kobject_name(kobj), kobj, __func__);
 	env = kzalloc(sizeof(struct kobj_uevent_env), GFP_KERNEL); /* environment buffer */
 	if (!env)
@@ -99,7 +99,7 @@ int kobject_uevent_env(struct kobject *kobj, enum kobject_action action, char *e
 	if (!devpath)
 		retval = -ENOENT;
 		goto exit;
-	retval = add_uevent_var(env, "ACTION=%s", action_string); // 将Action、路径信息、subsystem等信息，添加到env指针中
+	retval = add_uevent_var(env, "ACTION=%s", action_string); // 将Action、路径信息、subsystem等信息, 添加到env指针中
 	if (retval)
 		goto exit;
 	retval = add_uevent_var(env, "DEVPATH=%s", devpath);
